@@ -1,0 +1,121 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}   
+
+\usepackage{doi}
+\usepackage{natbib}
+
+\title{Agent-based modeling of agricultural land-use and environmental policy}
+\author{T. Orlando Da Costa, Ethan Hsu, Nikki Lin, Andrew Yang}
+
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+Land-use change is one of the main drivers of biodiversity loss, soil degradation, and changes in ecosystem functioning. Agricultural systems in particular must simultaneously provide food production, farmer income, and environmental public goods such as biodiversity, soil quality, and water regulation. However, these objectives are often in conflict: intensive agriculture increases short-run production but may degrade environmental quality over time. Designing policies that reconcile agricultural production and environmental sustainability is therefore a central problem in ecological economics and land system science.
+
+\section*{Question}
+
+A key policy question emerging from this literature is how do farmer decision rules and environmental subsidies influence land-use allocation and environmental outcomes in an agricultural landscape? In particular, can an environmentally targeted subsidy induce farmers to adopt less intensive land uses while maintaining farm-level profitability?
+
+We address this question using an agent-based model in which heterogeneous farmers allocate land across different uses depending on land quality, production costs, and policy incentives. We compare three regimes: a productivist regime where farmers maximize output, a market regime where farmers maximize profit, and a policy regime where farmers maximize profit including environmental subsidies. This approach follows the literature using agent-based land-use models to study agricultural policy and environmental outcomes (\cite{matthews2007abm, dai2020landsystem, baldi2025cap}).
+
+\section*{Significance}
+
+Modern agricultural policies must balance economic and environmental objectives (e.g. through environmental subsidies, conservation payments, and agri-environmental schemes), but the effectiveness of such policies depends on how farmers respond to incentives, which may vary across farms due to differences in land quality, costs, and preferences. Traditional optimization models often assume a representative farmer and therefore cannot capture heterogeneity or spatial interactions. On the opposite, agent-based models (ABMs) have become an important tool for studying land-use systems because they allow for heterogeneous agents, spatial interactions, and adaptive decision-making:: land-use evolution becomes the outcome of decentralized decisions made by individual farmers operating under different constraints and incentives (\cite{matthews2007abm, dai2020landsystem}). These models have been used to study agricultural policy, biodiversity conservation, and ecosystem services (\cite{brady2012abm}).
+
+Recent research using agent-based models shows that agricultural policy can produce complex trade-offs between farm income, production, and environmental outcomes, and that policy design plays a crucial role in determining these outcomes (\cite{coronese2023agrilove, bayram2024luxembourg, baldi2025cap}). This project contributes to this literature by constructing a simple theoretical agent-based model to study how environmental subsidies influence land-use decisions and environmental dynamics.
+
+\section*{Approach}
+
+We construct a spatially explicit agent-based model in discrete time. The landscape consists of plots $k = 1,\dots,K$ with land quality $q_k \in [0,1]$. Farmers $i = 1,\dots,N$ each control a subset of plots and choose a land use for each plot at each time step: intensive agriculture $I$, organic agriculture $O$, or conservation/set-aside $S$.
+
+\paragraph{Production}
+Output on plot $k$ depends on land quality and land use:
+\[
+y(a_{ik,t}, q_{k,t}),
+\]
+with
+\[
+y(I,q) > y(O,q) > y(S,q)=0.
+\]
+
+\paragraph{Environmental dynamics}
+Each plot has an environmental state variable $E_{k,t}$ representing soil quality / biodiversity index / ecological condition. Environmental quality evolves according to land use:
+\[
+E_{k,t+1} = E_{k,t} + r_S \mathbf{1}\{S\} + r_O \mathbf{1}\{O\} - d_I \mathbf{1}\{I\}.
+\]
+
+with $d_I > r_O \geq 0$ and $r_S > 0$
+Land quality evolves according to environmental quality:
+\[
+q_{k,t+1} = q_{k,t} + \theta E_{k,t}.
+\]
+
+\paragraph{Farmer objectives}
+We consider three decision regimes:
+
+\textbf{1. Output maximization (productivist regime):}
+\[
+\max Y_{i,t} = \sum_{k \in K_i} y(a_{ik,t}, q_{k,t}).
+\]
+
+\textbf{2. Profit maximization (market regime):}
+\[
+\max \pi_{i,t} =
+\sum_{k \in K_i} \left[p y(a_{ik,t}, q_{k,t}) - c(a_{ik,t}) \right].
+\]
+
+\textbf{3. Profit with environmental subsidy (policy regime):}
+The simplest version is a per-hectare payment for conservation or low-impact cultivation:
+\[
+Sub_{i,t} = s_S \sum_{k \in {K}_i} \mathbf{1}\{a_{ik,t}=S\}
++ s_O \sum_{k \in {K}_i} \mathbf{1}\{a_{ik,t}=O\}.
+\]
+\[
+\max \pi_{i,t} =
+\sum_{k \in K_i} \left[p y(a_{ik,t}, q_{k,t}) - c(a_{ik,t}) \right]
++ Sub_{i,t}.
+\]
+
+\paragraph{Behavioral heterogeneity.}
+To preserve the agent-based character of the model, farmers will differ in at least one of the following dimensions: plot quality, production costs, minimum acceptable income, or responsiveness to subsidy incentives. A simple implementation is to let farmer-specific costs be
+\[
+c_i(I) > c_i(O) > c_i(S),
+\]
+or to assign different reservation-profit thresholds $\bar{\pi}_i$.
+
+\paragraph{Simulation experiments.}
+We will simulate the model under four scenarios:
+\begin{enumerate}
+    \item baseline output maximization with no subsidy;
+    \item profit maximization with no environmental payment;
+    \item uniform eco-subsidy;
+    \item targeted eco-subsidy, where payments are higher on low-quality or ecologically sensitive plots.
+\end{enumerate}
+For each scenario we will compare:
+\begin{itemize}
+    \item total agricultural output;
+    \item mean farmer profit and the share of farmers above baseline profit;
+    \item land-use shares $(I,O,S)$;
+    \item average environmental quality $\bar E_t$;
+    \item spatial clustering of intensive versus conservation land.
+\end{itemize}
+
+
+\paragraph{Expected contribution.}
+Our expectation is that, without policy, the model will generate over-allocation to intensive land use, especially on high-quality plots, leading to environmental decline over time. A sufficiently well-calibrated eco-subsidy should partially reverse this pattern by making conservation or lower-impact cultivation privately attractive. The main result of interest is not simply that "more subsidy improves the environment", but whether there is an intermediate region in which environmental indicators improve substantially while farm profits are maintained.
+
+\paragraph{Possible extension.}
+If time permits, we will add either (i) social imitation, so that farmers partly copy profitable neighbors, or (ii) a result-based subsidy in which payments depend on realized ecological quality $E_{k,t}$ rather than on declared land use. This would allow us to compare practice-based and outcome-based policy designs.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
