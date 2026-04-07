@@ -22,65 +22,90 @@ Land-use change is one of the main drivers of biodiversity loss, soil degradatio
 
 \section*{Question}
 
-A key policy question emerging from this literature is how do farmer decision rules and environmental subsidies influence land-use allocation and environmental outcomes in an agricultural landscape? In particular, can an environmentally targeted subsidy induce farmers to adopt less intensive land uses while maintaining farm-level profitability?
+A key policy question emerging from this literature is how do farmer decision rules and environmental subsidies influence land-use allocation and environmental outcomes in an agricultural landscape. In particular, can an environmentally targeted subsidy induce farmers to adopt less intensive land uses while maintaining farm-level profitability?
 
 We address this question using an agent-based model in which heterogeneous farmers allocate land across different uses depending on land quality, production costs, and policy incentives. We compare three regimes: a productivist regime where farmers maximize output, a market regime where farmers maximize profit, and a policy regime where farmers maximize profit including environmental subsidies. This approach follows the literature using agent-based land-use models to study agricultural policy and environmental outcomes (\cite{matthews2007abm, dai2020landsystem, baldi2025cap}).
 
 \section*{Significance}
 
-Modern agricultural policies must balance economic and environmental objectives (e.g. through environmental subsidies, conservation payments, and agri-environmental schemes), but the effectiveness of such policies depends on how farmers respond to incentives, which may vary across farms due to differences in land quality, costs, and preferences. Traditional optimization models often assume a representative farmer and therefore cannot capture heterogeneity or spatial interactions. On the opposite, agent-based models (ABMs) have become an important tool for studying land-use systems because they allow for heterogeneous agents, spatial interactions, and adaptive decision-making:: land-use evolution becomes the outcome of decentralized decisions made by individual farmers operating under different constraints and incentives (\cite{matthews2007abm, dai2020landsystem}). These models have been used to study agricultural policy, biodiversity conservation, and ecosystem services (\cite{brady2012abm}).
+Modern agricultural policies must balance economic and environmental objectives (e.g. through environmental subsidies, conservation payments, and agri-environmental schemes), but the effectiveness of such policies depends on how farmers respond to incentives, which may vary across farms due to differences in land quality, costs, and preferences. Traditional optimization models often assume a representative farmer and therefore cannot capture heterogeneity or spatial interactions. On the opposite, agent-based models (ABMs) have become an important tool for studying land-use systems because they allow for heterogeneous agents, spatial interactions, and adaptive decision-making: land-use evolution becomes the outcome of decentralized decisions made by individual farmers operating under different constraints and incentives (\cite{matthews2007abm, dai2020landsystem}). These models have been used to study agricultural policy, biodiversity conservation, and ecosystem services (\cite{brady2012abm}).
 
 Recent research using agent-based models shows that agricultural policy can produce complex trade-offs between farm income, production, and environmental outcomes, and that policy design plays a crucial role in determining these outcomes (\cite{coronese2023agrilove, bayram2024luxembourg, baldi2025cap}). This project contributes to this literature by constructing a simple theoretical agent-based model to study how environmental subsidies influence land-use decisions and environmental dynamics.
 
 \section*{Approach}
 
-We construct a spatially explicit agent-based model in discrete time. The landscape consists of plots $k = 1,\dots,K$ with land quality $q_k \in [0,1]$. Farmers $i = 1,\dots,N$ each control a subset of plots and choose a land use for each plot at each time step: intensive agriculture $I$, organic agriculture $O$, or conservation/set-aside $S$.
+
+The landscape consists of plots $k = 1, \dots, K$, each characterized by an initial land quality $q_k \in [0,1]$. In the baseline model, land quality is spatially autocorrelated, so that neighboring plots tend to exhibit similar levels of quality. Formally, let $q_k$ be defined on a spatial grid, and assume
+\[
+q_k = f(\varepsilon_k), \qquad \varepsilon_k \sim \mathcal{N}(0,1),
+\]
+where $f(\cdot)$ is a smoothing operator (e.g. a Gaussian kernel applied over neighboring plots), inducing correlation such that
+\[
+\text{Cov}(q_k, q_{k'}) = \sigma^2 \exp\left(-\frac{d(k,k')}{\ell}\right),
+\]
+where $d(k,k')$ is the distance between plots $k$ and $k'$ and $\ell$ is a correlation length parameter. This formulation captures the empirical fact that land characteristics such as soil quality and environmental conditions are spatially clustered.
+
+Farmers $i = 1,\dots,N$ each control a subset $K_i$ of plots, with $N \leq K$ and $\sum_i |K_i| = K$. Heterogeneity in farm size is introduced by allowing farmers to control different numbers of plots. Specifically, farm sizes $m_i = |K_i|$ are drawn from a lognormal distribution:
+\[
+m_i \sim \text{Lognormal}(\mu, \sigma^2),
+\]
+which implies
+\[
+\ln m_i \sim \mathcal{N}(\mu, \sigma^2).
+\]
+This choice reflects the empirically observed right-skewed distribution of farm sizes, with many small farms and a few large ones. The $m_i$ are then rescaled if necessary so that $\sum_i m_i = K$ and $m_i \geq 1$ for all $i$. In the baseline model, all plots are normalized to equal area, so larger farms are represented by ownership of more plots rather than larger individual plots.
+
+To allocate farmers over this heterogeneous landscape, we assign ownership of plots to farmers in a way that is consistent with both farm-size heterogeneity and spatial structure. Let $m_i = |K_i|$ denote the number of plots controlled by farmer $i$. Conditional on the distribution of $m_i$, plots are assigned using a spatially clustered allocation rule: each farmer is first assigned an initial seed plot drawn uniformly at random, and additional plots are then allocated iteratively by selecting neighboring plots of already owned land until the farmer reaches $m_i$ plots. Formally, if $\mathcal{N}(k)$ denotes the set of neighboring plots of $k$, then new plots are drawn from $\bigcup_{k \in K_i} \mathcal{N}(k)$ until $|K_i| = m_i$. This procedure generates spatially contiguous farm holdings and ensures that farmers operate on locally similar land, reflecting real-world patterns of land consolidation.
+
+At each time step, farmers observe current land quality, environmental conditions, and policy incentives, and choose the land use of each plot. In the baseline model, these decisions are updated period by period; as a possible extension, adjustment costs or switching frictions may be introduced to limit unrealistic year-to-year reallocation.
 
 \paragraph{Production}
-Output on plot $k$ depends on land quality and land use:
+Let $a_{i,k,t} \in \{I,O,S\}$ denote the land use chosen by farmer $i$ on plot $k$ at time $t$, where $I$ denotes intensive agriculture, $O$ organic agriculture, and $S$ conservation/set-aside. Output on plot $k$ at time $t$ depends on current land quality and land use:
 \[
-y(a_{ik,t}, q_{k,t}),
+y(a_{i,k,t}, q_{k,t}),
 \]
 with
 \[
-y(I,q) > y(O,q) > y(S,q)=0.
+y(I,q_{k,t}) > y(O,q_{k,t}) > y(S,q_{k,t}) = 0.
 \]
 
 \paragraph{Environmental dynamics}
 Each plot has an environmental state variable $E_{k,t}$ representing soil quality / biodiversity index / ecological condition. Environmental quality evolves according to land use:
 \[
-E_{k,t+1} = E_{k,t} + r_S \mathbf{1}\{S\} + r_O \mathbf{1}\{O\} - d_I \mathbf{1}\{I\}.
+E_{k,t+1} = E_{k,t} + r_S \mathbf{1}\{a_{i,k,t}=S\} + r_O \mathbf{1}\{a_{i,k,t}=O\} - d_I \mathbf{1}\{a_{i,k,t}=I\}.
 \]
-
-with $d_I > r_O \geq 0$ and $r_S > 0$
-Land quality evolves according to environmental quality:
+We assume
+\[
+d_I > r_S > r_O \geq 0,
+\]
+so that conservation generates the strongest environmental improvement, organic agriculture a smaller positive effect, and intensive agriculture degrades environmental quality. Land quality then evolves according to environmental quality:
 \[
 q_{k,t+1} = q_{k,t} + \theta E_{k,t}.
 \]
 
 \paragraph{Farmer objectives}
-We consider three decision regimes:
+Let $p>0$ denote the output price and let $c_i(a_{i,k,t})$ denote the cost incurred by farmer $i$ from assigning land use $a_{i,k,t}$ to plot $k$ at time $t$. We consider three decision regimes:
 
 \textbf{1. Output maximization (productivist regime):}
 \[
-\max Y_{i,t} = \sum_{k \in K_i} y(a_{ik,t}, q_{k,t}).
+\max Y_{i,t} = \sum_{k \in K_i} y(a_{i,k,t}, q_{k,t}).
 \]
 
 \textbf{2. Profit maximization (market regime):}
 \[
-\max \pi_{i,t} =
-\sum_{k \in K_i} \left[p y(a_{ik,t}, q_{k,t}) - c(a_{ik,t}) \right].
+\max \pi^{M}_{i,t} =
+\sum_{k \in K_i} \left[p\, y(a_{i,k,t}, q_{k,t}) - c_i(a_{i,k,t}) \right].
 \]
 
 \textbf{3. Profit with environmental subsidy (policy regime):}
 The simplest version is a per-hectare payment for conservation or low-impact cultivation:
 \[
-Sub_{i,t} = s_S \sum_{k \in {K}_i} \mathbf{1}\{a_{ik,t}=S\}
-+ s_O \sum_{k \in {K}_i} \mathbf{1}\{a_{ik,t}=O\}.
+Sub_{i,t} = s_S \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t}=S\}
++ s_O \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t}=O\}.
 \]
 \[
-\max \pi_{i,t} =
-\sum_{k \in K_i} \left[p y(a_{ik,t}, q_{k,t}) - c(a_{ik,t}) \right]
+\max \pi^{P}_{i,t} =
+\sum_{k \in K_i} \left[p\, y(a_{i,k,t}, q_{k,t}) - c_i(a_{i,k,t}) \right]
 + Sub_{i,t}.
 \]
 
