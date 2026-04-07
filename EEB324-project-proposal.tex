@@ -83,6 +83,37 @@ so that conservation generates the strongest environmental improvement, organic 
 q_{k,t+1} = q_{k,t} + \theta E_{k,t}.
 \]
 
+$\theta > 0$ measures the sensitivity of land quality to environmental conditions and determines the speed at which ecological dynamics translate into changes in productive capacity. Since $q_{k,t} \in [0,1]$, $\theta$ is chosen sufficiently small so that updates remain bounded in this interval (after truncation if necessary), and can be interpreted as a scaling parameter linking environmental quality units to land productivity.
+
+\paragraph{Subsidy design.}
+To study how policy design shapes land-use allocation, we consider three stylized subsidy designs: a differentiated practice-based subsidy,a conversion subsidy, and a results-based subsidy.
+
+First, we consider a \emph{practice-based subsidy} that pays different amounts depending on the practice implemented:
+\[
+Sub^{P}_{i,t} = s_O \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t}=O\} + s_S \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t}=S\},
+\]
+with $s_S > s_O > 0$ when conservation is intended to generate a larger environmental gain than organic production.
+
+
+Second, we consider a \emph{conversion-to-organic subsidy} that rewards the transition from intensive to organic agriculture. A simple specification is:
+\[
+Sub^{C}_{i,t} = s_C \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t-1}=I,\; a_{i,k,t}=O\},
+\]
+where $s_C>0$ is a one-period payment made when a plot is converted from intensive to organic use. A richer alternative, closer to multi-year conversion support, is:
+\[
+Sub^{C,T}_{i,t} = s_C \sum_{k \in K_i} \mathbf{1}\{0 < t-t^{conv}_{i,k} \leq T_C\},
+\]
+where $t^{conv}_{i,k}$ is the period in which plot $k$ was most recently converted to organic production.
+
+Third, we consider a \emph{results-based subsidy} tied to realized ecological outcomes rather than declared practices. Let $E_{k,t}$ denote an observable ecological performance indicator on plot $k$ at time $t$. A simple specification is:
+\[
+Sub^{R}_{i,t} = \beta \sum_{k \in K_i} E_{k,t}, \qquad \beta > 0,
+\]
+or, more conservatively,
+\[
+Sub^{R,th}_{i,t} = \beta \sum_{k \in K_i} \mathbf{1}\{E_{k,t} \geq \bar B\}.
+\]
+
 \paragraph{Farmer objectives}
 Let $p>0$ denote the output price and let $c_i(a_{i,k,t})$ denote the cost incurred by farmer $i$ from assigning land use $a_{i,k,t}$ to plot $k$ at time $t$. We consider three decision regimes:
 
@@ -98,11 +129,7 @@ Let $p>0$ denote the output price and let $c_i(a_{i,k,t})$ denote the cost incur
 \]
 
 \textbf{3. Profit with environmental subsidy (policy regime):}
-The simplest version is a per-hectare payment for conservation or low-impact cultivation:
-\[
-Sub_{i,t} = s_S \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t}=S\}
-+ s_O \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t}=O\}.
-\]
+
 \[
 \max \pi^{P}_{i,t} =
 \sum_{k \in K_i} \left[p\, y(a_{i,k,t}, q_{k,t}) - c_i(a_{i,k,t}) \right]
@@ -110,20 +137,14 @@ Sub_{i,t} = s_S \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t}=S\}
 \]
 
 \paragraph{Behavioral heterogeneity.}
-To preserve the agent-based character of the model, farmers will differ in at least one of the following dimensions: plot quality, production costs, minimum acceptable income, or responsiveness to subsidy incentives. A simple implementation is to let farmer-specific costs be
-\[
-c_i(I) > c_i(O) > c_i(S),
-\]
-or to assign different reservation-profit thresholds $\bar{\pi}_i$.
+To preserve the agent-based character of the model while keeping the specification parsimonious, farmers differ primarily in plot endowments, farm size, and private net costs of assigning a given land use to a plot. We therefore use a single farmer-specific cost function $c_i(a_{i,k,t},q_{k,t})$, interpreted broadly as the private net cost of assigning practice $a_{i,k,t}$ to plot $k$, including production-related costs and any private burden associated with adoption. We do not impose a fixed ranking between the costs of intensive and organic agriculture, since their relative magnitudes may vary across crops, technologies, and local conditions. We assume only that conservation/set-aside has a lower direct private cost than active production, so that:
+\[c_i(S) < c_i(I), \qquad c_i(S) < c_i(O)\]
+
+As a possible extension, we may introduce farmer-specific responsiveness to policy incentives. Let $\rho_i \in [0,1]$ denote the probability that farmer $i$ updates land use in response to a change in relative net returns, so that lower values of $\rho_i$ capture greater behavioural stickiness. In the baseline model, however, responsiveness is not imposed directly and instead emerges from heterogeneity in costs, land quality, and farm structure.
+
 
 \paragraph{Simulation experiments.}
-We will simulate the model under four scenarios:
-\begin{enumerate}
-    \item baseline output maximization with no subsidy;
-    \item profit maximization with no environmental payment;
-    \item uniform eco-subsidy;
-    \item targeted eco-subsidy, where payments are higher on low-quality or ecologically sensitive plots.
-\end{enumerate}
+We will simulate the model under the three decision regimes.
 For each scenario we will compare:
 \begin{itemize}
     \item total agricultural output;
@@ -138,7 +159,21 @@ For each scenario we will compare:
 Our expectation is that, without policy, the model will generate over-allocation to intensive land use, especially on high-quality plots, leading to environmental decline over time. A sufficiently well-calibrated eco-subsidy should partially reverse this pattern by making conservation or lower-impact cultivation privately attractive. The main result of interest is not simply that "more subsidy improves the environment", but whether there is an intermediate region in which environmental indicators improve substantially while farm profits are maintained.
 
 \paragraph{Possible extension.}
-If time permits, we will add either (i) social imitation, so that farmers partly copy profitable neighbors, or (ii) a result-based subsidy in which payments depend on realized ecological quality $E_{k,t}$ rather than on declared land use. This would allow us to compare practice-based and outcome-based policy designs.
+If time permits, we will extend the model in two directions. First, we will introduce {social imitation}, so that farmers may probabilistically copy the land-use choices of nearby successful farmers. Let $\mathcal{N}(i)$ denote the set of farmers located within a given spatial radius of farmer $i$, and let $w_{ij}$ be proximity weights satisfying $w_{ij} \propto \exp(-d_{ij}/\lambda)$ and $\sum_{j \in \mathcal{N}(i)} w_{ij}=1$, where $d_{ij}$ is the distance between farmers $i$ and $j$ and $\lambda$ governs the spatial decay of influence. Let $\bar{\pi}_{j,t}$ denote farmer $j$'s recent average profit. Then farmer $i$ updates by imitation with probability
+\[
+P^{imit}_{i,t} = \rho_i \sum_{j \in \mathcal{N}(i)} w_{ij} \frac{\max\{\bar{\pi}_{j,t}-\bar{\pi}_{i,t},0\}}{1+\max_{\ell \in \mathcal{N}(i)} |\bar{\pi}_{\ell,t}-\bar{\pi}_{i,t}|},
+\]
+where $\rho_i \in [0,1]$ captures farmer-specific behavioural responsiveness. Conditional on imitation, farmer $i$ copies the land-use rule or plot-level allocation of a neighboring farmer $j$ drawn with probability proportional to $w_{ij}\max\{\bar{\pi}_{j,t}-\bar{\pi}_{i,t},0\}$. \\
+
+Second, we will allow for {path dependence and threshold ecological dynamics}. In particular, land quality may become difficult to restore once environmental conditions fall below a critical threshold. A simple specification is
+\[
+q_{k,t+1} = q_{k,t} + \theta E_{k,t} - \delta \, \mathbf{1}\{E_{k,t}<\underline{E}\},
+\]
+where $\underline{E}$ is a degradation threshold and $\delta>0$ is an additional persistent loss in productive capacity incurred when the plot crosses that threshold. More generally, recovery may become weaker after collapse, for example:
+\[
+q_{k,t+1} = q_{k,t} + \theta_1 E_{k,t}\mathbf{1}\{E_{k,t}\geq \underline{E}\} + \theta_2 E_{k,t}\mathbf{1}\{E_{k,t}<\underline{E}\}, \qquad 0 \leq \theta_2 < \theta_1,
+\]
+so that ecological degradation generates hysteresis. These extensions would allow us to study whether temporary policy or imitation-induced shifts in behaviour can prevent irreversible land degradation or, conversely, whether early intensive use can lock parts of the landscape into persistently low-quality states.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
