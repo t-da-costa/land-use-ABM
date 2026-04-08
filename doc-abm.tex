@@ -1,0 +1,61 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}   
+
+\title{Documentation}
+\begin{document}
+\maketitle
+\section{Parameters}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|p{5cm}|}
+\hline
+\textbf{Parameter} & \textbf{Value Range} & \textbf{Description} \\
+\hline
+n\_rows & $> 0$ & Vertical size of the grid  \\
+\hline
+n\_cols & $> 0$ & Horizontal size of the grid  \\
+\hline
+(x,y) & $ (0,0)$ ; $(n_{rows}-1, n_{cols}-1) $ & Grid coordinates \\
+\hline
+PlotID & 0 ; $K - 1 = n_{rows} \times n_{cols} - 1$ & Plot Identifier \\
+\hline
+\hline
+n\_farmers & 1 ; $N < K$ & Number of farmers \\
+\hline
+FarmerID & 0 ; $N - 1$ & Farmer Identifier \\
+\hline
+farm\_mu & $\mathbb{R}$ & Mean parameter of the underlying distribution (lognormal farm-size distribution) \\
+\hline
+farm\_sigma & $> 0$ & Standard deviation of the underlying distribution (lognormal farm-size distribution) \\
+\hline
+\hline
+q & 0 ; 1 & Plot quality \\
+\hline
+q\_sigma & $> 0$ & Scaling parameter applied before normalization \\
+\hline
+q\_length\_scale & $> 0$ & Length scale of the Gaussian kernel used to smooth the noise \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Modules}
+\subsection{Module 1: Landscape Generation}
+
+The \emph{landscape} is a rectangular grid of $n_{rows} \times n_{cols}$, containing $K$ plots. \\
+
+\noindent A \emph{plot} is defined by its ID \texttt{PlotID}, its coordinates \texttt{(x,y)}, and its quality \texttt{q}. \\
+Von Neumann neighborhood (N, S, E, W) is used to determine the adjacent plots. \\
+The Euclidean distance ($d = \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$) is used to determine the distance between two plots. \\
+
+\noindent The quality of each plot is generated from Gaussian noise with mean $0$, smoothed using a Gaussian kernel with length scale \texttt{q\_length\_scale}, then rescaled using \texttt{q\_sigma}. The quality values are then normalized on [0, 1]. \\
+
+\noindent There are $N < K = n_{rows} \times n_{cols}$ \emph{farmers} in the landscape, each owning a number of plots drawn from a lognormal distribution with parameters \texttt{farm\_mu} and \texttt{farm\_sigma}. Each farmer owns at least one plot, and the total number of plots owned by all farmers equals $K$. 
+
+\noindent Farmers are defined by their ID \texttt{FarmerID} and the list of plots \texttt{plotID} they own: the number of plots owned corresponds to the farm's size $m$.
+
+\end{document}
