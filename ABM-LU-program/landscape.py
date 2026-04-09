@@ -1,3 +1,7 @@
+##################################################################
+## This module builds the spatial landscape with autocorrelated 
+# land quality and allocates plots to farmers.
+##################################################################
 
 from __future__ import annotations
 

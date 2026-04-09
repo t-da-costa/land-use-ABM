@@ -31,14 +31,16 @@ FarmerID & 0 ; $N - 1$ & Farmer Identifier \\
 \hline
 farm\_mu & $\mathbb{R}$ & Mean parameter of the underlying distribution (lognormal farm-size distribution) \\
 \hline
-farm\_sigma & $> 0$ & Standard deviation of the underlying distribution (lognormal farm-size distribution) \\
+farm\_sigma & $\geq 0$ & Standard deviation of the underlying distribution (lognormal farm-size distribution) \\
 \hline
 \hline
 q & 0 ; 1 & Plot quality \\
 \hline
-q\_sigma & $> 0$ & Scaling parameter applied before normalization \\
+q\_sigma & $\mathbb{R}$ & Scaling parameter before normalization. 
+
+No change if $q > 0$, inverted map if $q < 0$, homogeneous quality if $q = 0$. \\
 \hline
-q\_length\_scale & $> 0$ & Length scale of the Gaussian kernel used to smooth the noise \\
+q\_length\_scale & $\geq 0$ & Length scale of the Gaussian kernel used to smooth the noise \\
 \hline
 \end{tabular}
 \end{table}
