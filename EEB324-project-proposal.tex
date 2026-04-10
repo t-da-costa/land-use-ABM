@@ -69,14 +69,14 @@ with
 \[
 y(I,q_{k,t}) > y(O,q_{k,t}) > y(S,q_{k,t}) = 0.
 \]
-To capture how productivity depends on land quality, we specify yield functions of the form:
+To capture how productivity depends on land quality, we specify yield functions in the following way:
 \[
 y(I,q_{k,t}) = \alpha_I q_{k,t}^{\gamma_I}, \qquad
 \]
 \[
 y(O,q_{k,t}) = \alpha_O q_{k,t}, \qquad
 \]
-Where $alpha_I$, $alpha_O$, and $gamma_I$ are positive paramters that determine productivity and the responsiveness of yields to land quality. 
+Where $\alpha_I$, $\alpha_O$, and $\gamma_I$ are positive parameters that determine the productivity and the responsiveness of the yields to the quality of the land. 
 
 \paragraph{Production Cost}
 Intensive agriculture relies heavily on purchase inputs such as fertilizers and pesticides, while organic production requires greater labor and management efforts. Production cost also tend to rise with the decline of land quality, as there is an increase in input requirements on degraded soils (\cite{usda2010impact, durham2021economics}). So, baseline costs are defined as:
@@ -174,8 +174,8 @@ where
 \]
 We do not impose a fixed ranking between the costs of intensive and organic agriculture, since their relative magnitudes may vary across crops, technologies, and local conditions. We assume only that conservation/set-aside has a lower direct private cost than active production, so that:
 \[c_i(S,q_{k,t}) < c_i(I,q_{k,t}), \qquad c_i(S,q_{k,t}) < c_i(O,q_{k,t})\]
-\sethlcolor{cyan}
-\hl{if we want to keep simple and not include the complexity of land quality for cost, we can stick to c_i(S), c_i(I), c_i(O) model, where it just become c_I + \eta_{i,I}}
+
+\paragraph{if we want to keep simple and not include the complexity of land quality for cost, we can stick to c_i(S), c_i(I), c_i(O) model, where it just become c_I + \eta_{i,I}}
 
 As a possible extension, we may introduce farmer-specific responsiveness to policy incentives. Let $\rho_i \in [0,1]$ denote the probability that farmer $i$ updates land use in response to a change in relative net returns, so that lower values of $\rho_i$ capture greater behavioural stickiness. In the baseline model, however, responsiveness is not imposed directly and instead emerges from heterogeneity in costs, land quality, and farm structure.
 
