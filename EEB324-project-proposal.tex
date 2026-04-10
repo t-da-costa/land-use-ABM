@@ -69,6 +69,26 @@ with
 \[
 y(I,q_{k,t}) > y(O,q_{k,t}) > y(S,q_{k,t}) = 0.
 \]
+To capture how productivity depends on land quality, we specify yielf functions of the form:
+\[
+y(I,q_{k,t}) = \alpha_I q_{k,t}^{\gamma_I}, \qquad
+\]
+\[
+y(O,q_{k,t}) = \alpha_O q_{k,t}, \qquad
+\]
+Where $alpha_I$, $alpha_O$, and $gamma_I$ are positive paramters that determine productivity and the responsiveness of yields to land quality. 
+
+\paragraph{Production Cost}
+Intensive agriculture relies heavily on purchase inputs such as fertilizers and pesticides, while organic production requires greater labor and management efforts. Production cost also tend to rise with the decline of land quality, as there is an increase in input requirements on degraded soils (\cite{usda2010impact, durham2021economics}). So, baseline costs are defined as:
+\[
+c(I, q_{k,t}) = c_I + \kappa_I(1-q_{k,t})
+\]
+\[
+c(O, q_{k,t}) = c_O + \kappa_O(1-q_{k,t})
+\]
+\[
+c(S, q_{k,t}) = c_S + \kappa_S(1-q_{k,t})
+\]
 
 \paragraph{Environmental dynamics}
 Each plot has an environmental state variable $E_{k,t}$ representing soil quality / biodiversity index / ecological condition. Environmental quality evolves according to land use:
@@ -137,9 +157,25 @@ Let $p>0$ denote the output price and let $c_i(a_{i,k,t})$ denote the cost incur
 + Sub_{i,t}.
 \]
 
-\paragraph{Behavioral heterogeneity.}
-To preserve the agent-based character of the model while keeping the specification parsimonious, farmers differ primarily in plot endowments, farm size, and private net costs of assigning a given land use to a plot. We therefore use a single farmer-specific cost function $c_i(a_{i,k,t},q_{k,t})$, interpreted broadly as the private net cost of assigning practice $a_{i,k,t}$ to plot $k$, including production-related costs and any private burden associated with adoption. We do not impose a fixed ranking between the costs of intensive and organic agriculture, since their relative magnitudes may vary across crops, technologies, and local conditions. We assume only that conservation/set-aside has a lower direct private cost than active production, so that:
-\[c_i(S) < c_i(I), \qquad c_i(S) < c_i(O)\]
+\paragraph{Farmer heterogeneity.}
+To preserve the agent-based character of the model while keeping the specification parsimonious, farmers differ primarily in plot endowments, farm size, and private net costs of assigning a given land use to a plot. We therefore use a single farmer-specific cost function $c_i(a_{i,k,t},q_{k,t})$, interpreted broadly as the private net cost of assigning practice $a_{i,k,t}$ to plot $k$, including production-related costs and any private burden associated with adoption. To capture heterogeneity accross farmers, we introduce technology-specific cost components $\eta_{i, I}$ and $\eta_{i,O}$ representing the differences in management ability, technology adoption, and opportunity costs under intensive and organic production. Farmer-specific costs are defined as:
+\[
+c_i(I,q_{k,t}) = c(I,q_{k,t}) + \eta_{i,I}
+\]
+\[
+c_i(O,q_{k,t}) = c(O,q_{k,t}) + \eta_{i,O}
+\]
+\[
+c_i(S,q_{k,t}) = c(S,q_{k,t})
+\]
+where
+\[
+\eta_{i,I}, \eta_{i,O} \sim \mathcal {N}(0,\sigma_\eta^2)
+\]
+We do not impose a fixed ranking between the costs of intensive and organic agriculture, since their relative magnitudes may vary across crops, technologies, and local conditions. We assume only that conservation/set-aside has a lower direct private cost than active production, so that:
+\[c_i(S,q_{k,t}) < c_i(I,q_{k,t}), \qquad c_i(S,q_{k,t}) < c_i(O,q_{k,t})\]
+\sethlcolor{cyan}
+\hl{if we want to keep simple and not include the complexity of land quality for cost, we can stick to c_i(S), c_i(I), c_i(O) model, where it just become c_I + \eta_{i,I}}
 
 As a possible extension, we may introduce farmer-specific responsiveness to policy incentives. Let $\rho_i \in [0,1]$ denote the probability that farmer $i$ updates land use in response to a change in relative net returns, so that lower values of $\rho_i$ capture greater behavioural stickiness. In the baseline model, however, responsiveness is not imposed directly and instead emerges from heterogeneity in costs, land quality, and farm structure.
 
