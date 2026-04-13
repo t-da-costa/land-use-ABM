@@ -8,6 +8,13 @@
 \title{Documentation}
 \begin{document}
 \maketitle
+
+\section{Ideas from Brady et al.}
+
+Use species-area relationships?
+
+Larger field sizes imply lower unit costs of production
+
 \section{Parameters}
 
 \begin{table}[h]
@@ -46,7 +53,7 @@ q\_length\_scale & $\geq 0$ & Length scale of the Gaussian kernel used to smooth
 \end{table}
 
 \section{Modules}
-\subsection{Module 1: Landscape Generation}
+\subsection{Landscape Generation}
 
 The \emph{landscape} is a rectangular grid of $n_{rows} \times n_{cols}$, containing $K$ plots. \\
 
@@ -59,5 +66,7 @@ The Euclidean distance ($d = \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$) is used to deter
 \noindent There are $N < K = n_{rows} \times n_{cols}$ \emph{farmers} in the landscape, each owning a number of plots drawn from a lognormal distribution with parameters \texttt{farm\_mu} and \texttt{farm\_sigma}. Each farmer owns at least one plot, and the total number of plots owned by all farmers equals $K$. 
 
 \noindent Farmers are defined by their ID \texttt{FarmerID} and the list of plots \texttt{plotID} they own: the number of plots owned corresponds to the farm's size $m$.
+
+\subsection{Agriculture production}
 
 \end{document}
