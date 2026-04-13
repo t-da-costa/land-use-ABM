@@ -21,7 +21,8 @@ q_length_scale = 3.0
 
 ##### SIMULATION PARAMETERS #####
 n_steps = 25 
-regime = "policy" #choose from: "productivist", "market", "policy"
+regime = "policy"           #choose from: "productivist", "market", "policy"
+subsidy_type = "practice"   #choose from: "practice", "conversion", "results"
 
 ##### PRODUCTION PARAMETERS #####
 
