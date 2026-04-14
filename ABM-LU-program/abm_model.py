@@ -70,7 +70,7 @@ initial_land_use = farm_init.initialize_land_use_by_farm_size(
     small_rules=small_rules,
     medium_rules=medium_rules,
     large_rules=large_rules,
-    allocation_mode="random",  # choose from: "random", "quality_based"
+    allocation_mode="random",  # choose from: "random", "quality_based" ## quality_based doesn't work yet.
 )
 
 

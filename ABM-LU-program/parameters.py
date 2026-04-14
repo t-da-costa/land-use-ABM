@@ -58,7 +58,7 @@ sigma_eta_O = 0.015
 
 r_S = 0.06
 r_O = 0.03
-d_I = 0.05
+d_I = 0.07
 theta = 0.02
 initial_E = 0.0
 
@@ -74,3 +74,4 @@ s_C = 0.25
 ##### RESULTS-BASED SUBSIDY #####
 
 beta = 0.15
+B_bar = 0.5

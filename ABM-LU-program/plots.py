@@ -200,7 +200,6 @@ def plot_initial_land_use_with_farm_borders(
 
     land_use_grid = np.empty((landscape.n_rows, landscape.n_cols), dtype=object)
     land_use_to_code = {"S": 0, "O": 1, "I": 2}
-    code_to_label = {0: "Conservation", 1: "Organic", 2: "Intensive"}
 
     coded_grid = np.full((landscape.n_rows, landscape.n_cols), fill_value=np.nan, dtype=float)
 
