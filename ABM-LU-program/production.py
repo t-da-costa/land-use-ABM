@@ -1,3 +1,7 @@
+##################################################################
+## This module defines the yields, costs, revenues and profit per plot and per farmer.
+##################################################################
+
 from __future__ import annotations
 
 from dataclasses import dataclass
