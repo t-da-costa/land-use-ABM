@@ -15,9 +15,11 @@ Use species-area relationships?
 
 Larger field sizes imply lower unit costs of production
 
-\section{Parameters}
+\section{Parameters \& Variables}
 
-\begin{table}[h]
+\subsection{Parameters}
+
+\begin{table}[h!]
 \centering
 \begin{tabular}{|l|c|p{5cm}|}
 \hline
@@ -49,6 +51,40 @@ No change if $q > 0$, inverted map if $q < 0$, homogeneous quality if $q = 0$. \
 \hline
 q\_length\_scale & $\geq 0$ & Length scale of the Gaussian kernel used to smooth the noise \\
 \hline
+\hline
+alpha & $\mathbb{R}^+$ & Yield multiplicator\\
+\hline
+gamma & $\mathbb{R}^+$ & Yield exponent\\
+\hline
+c & $\mathbb{R}^+$ & Baseline cost  \\
+\hline
+kappa & $\mathbb{R}^+$ & Coefficient for quality-dependent cost \\
+\hline
+eta & $\mathbb{R}^+$ & Farmer-specific cost \\
+\hline
+output\_price & $\mathbb{R}^+$ & Price per unit of output. \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Variables}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|p{5cm}|}
+\hline
+\textbf{Variable} & \textbf{Value Range} & \textbf{Description} \\
+\hline
+LandUse & \{I, O, S\} & Land use: Intensive agriculture (I), Organic agriculture (O), or Conservation (S) \\
+\hline
+Yield & $\mathbb{R}^+$ & Yield of the plot \\
+\hline
+Cost & $\mathbb{R}^+$ & Production cost of the plot \\
+\hline
+Revenue & $\mathbb{R}^+$ & Production revenue of the plot, $\text{Price} \times \text{Yield}$ \\
+\hline
+profit\_before\_subsidy & $\mathbb{R}^+$ & Production profit of the plot, $\text{Revenue} - \text{Cost}$ \\
+\hline
 \end{tabular}
 \end{table}
 
@@ -65,8 +101,42 @@ The Euclidean distance ($d = \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$) is used to deter
 
 \noindent There are $N < K = n_{rows} \times n_{cols}$ \emph{farmers} in the landscape, each owning a number of plots drawn from a lognormal distribution with parameters \texttt{farm\_mu} and \texttt{farm\_sigma}. Each farmer owns at least one plot, and the total number of plots owned by all farmers equals $K$. 
 
-\noindent Farmers are defined by their ID \texttt{FarmerID} and the list of plots \texttt{plotID} they own: the number of plots owned corresponds to the farm's size $m$.
+\noindent Farmers are defined by their ID \texttt{FarmerID} and the list of plots \texttt{plotID} they own: the number of plots owned corresponds to the farm's size $m$. 
 
 \subsection{Agriculture production}
+
+Let us consider that a single crop is produced in the landscape, and that the price of the output is exogenous and constant over time. \\
+
+\noindent The \emph{yield} of a plot depends on its quality $q$ and its land use (intensive agriculture, organic agriculture, or conservation), such that: 
+\begin{equation}
+    \text{Yield} = \alpha(\text{LandUse}) \cdot q^{\gamma(\text{LandUse})}
+\end{equation}
+where $\alpha$ and $\gamma$ are parameters that differ between land use types. \\
+
+\noindent \emph{Costs} of production can be decomposed into a baseline cost (e.g. fixed costs of production), one that depends on plot quality, and a farmer-specific cost component drawn once at the beginning for each farmer from a normal distribution with mean $0$ and standard deviation $\sigma_{\eta}$.
+\begin{equation}
+    \text{Cost}_i = c(\text{LandUse}) + \kappa(\text{LandUse}) \cdot (1 - q) + \eta_i(\text{LandUse}), \quad \eta_i(\text{LandUse}) \sim \mathcal {N}(0,\sigma_\eta^2)
+\end{equation}
+
+\noindent The {revenue} is simply the product of yield and price, and the profit before subsidy is the difference between revenue and cost.
+
+% Among the 10\% bigger farms: 
+% \begin{itemize}
+%     \item 50\% of the plot are 100\% intensive
+%     \item 50\% of the plot are 90\% intensive and 10\% conservation.
+% \end{itemize}
+
+% Among the 50\% smaller farms: 
+% \begin{itemize}
+%     \item 50\% of the plot are 100\% intensive
+%     \item 50\% of the plot are 100\% organic.
+% \end{itemize}
+
+% Among the 40\% medium farms:
+% \begin{itemize}
+%     \item 30\% of the plot are 100\% intensive
+%     \item 30\% of the plot are 90\% intensive and 10\% conservation.
+%     \item 40\% of the plot are 100\% organic.
+% \end{itemize}
 
 \end{document}

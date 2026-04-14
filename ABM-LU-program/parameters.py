@@ -29,23 +29,30 @@ subsidy_type = "practice"   #choose from: "practice", "conversion", "results"
 output_price = 1.0
 
 alpha_I = 1.2
+
 organic_to_intensive_yield_ratio = 0.75
 alpha_O = organic_to_intensive_yield_ratio * alpha_I
+
 gamma_I = 1.0
+gamma_0 = 1.0
 
-##### COST PARAMETERS #####
+##### PRODUCTION COST PARAMETERS #####
 
+# Higher fixed-cost and higher sensitivity to land quality for intensive agriculture compared to organic
 c_I = 0.35
-c_O = 0.28
-c_S = 0.05
-
 kappa_I = 0.30
+
+c_O = 0.28
 kappa_O = 0.20
-kappa_S = 0.02
+
+# no production cost for set-aside land
+c_S = 0.0
+kappa_S = 0.0
 
 ##### FARMER HETEROGENEITY #####
 
-eta_sigma = 0.10
+sigma_eta_I = 0.010
+sigma_eta_O = 0.015
 
 ##### ENVIRONMENTAL DYNAMICS #####
 
