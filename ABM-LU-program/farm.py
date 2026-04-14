@@ -66,9 +66,7 @@ class FarmInitializer:
     def __init__(self, seed: Optional[int] = None) -> None:
         self.rng = np.random.default_rng(seed)
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
+
     def initialize_land_use_by_farm_size(
         self,
         farmer_plot_ids: Dict[int, List[int]],
@@ -221,8 +219,10 @@ class FarmInitializer:
             # Lowest-q plots go to conservation, highest-q plots go to intensive,
             # and the middle part goes to organic.
             S_ids = sorted_plot_ids[:n_S]
-            I_ids = sorted_plot_ids[n_S:n_S + n_I]
-            O_ids = sorted_plot_ids[n_S + n_I:]
+            I_ids = sorted_plot_ids[-n_I:] if n_I > 0 else []
+            middle_start = n_S
+            middle_end = len(sorted_plot_ids) - n_I
+            O_ids = sorted_plot_ids[middle_start:middle_end]
             # Reorder I_ids so the very best plots are intensive.
             I_ids = sorted(I_ids, key=lambda pid: plots_by_id[pid]["q"], reverse=True)
 

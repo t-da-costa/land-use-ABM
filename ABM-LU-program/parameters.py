@@ -9,9 +9,9 @@ seed = 67
 
 ##### LANDSCAPE PARAMETERS #####
 
-n_rows = 20
-n_cols = 20
-n_farmers = 30
+n_rows = 10
+n_cols = 10
+n_farmers = 10
 
 farm_mu = 0.0 
 farm_sigma = 1.0

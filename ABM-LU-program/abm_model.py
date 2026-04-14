@@ -70,7 +70,7 @@ initial_land_use = farm_init.initialize_land_use_by_farm_size(
     small_rules=small_rules,
     medium_rules=medium_rules,
     large_rules=large_rules,
-    allocation_mode="quality_based",
+    allocation_mode="random",  # choose from: "random", "quality_based"
 )
 
 
@@ -91,3 +91,18 @@ pl.plot_quality_with_farm_borders(
     show=False,
 )
 
+## Initial land-use allocation and farm boundaries
+pl.plot_initial_land_use_with_farm_borders(
+    land,
+    land_use_by_plot=initial_land_use,
+    figsize=(8, 8),
+    color_I="#d73027",
+    color_O="#1a9850",
+    color_S="#4575b4",
+    border_color="white",
+    border_linewidth=1.0,
+    show_axes=False,
+    title="Initial land-use allocation and farm boundaries",
+    savepath=p.savepath.replace(".png", "_landuse.png") if isinstance(p.savepath, str) else None,
+    show=False,
+)
