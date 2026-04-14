@@ -1,76 +1,153 @@
 ##################################################################
-## This module defines the parameter values of the model.
+## Central parameter definitions for the ABM-LU project.
 ##################################################################
 
-#### Change the savepath variable to save the graph to a different location. ####
-savepath = "Courses/S2-EEB/324-Theoretical-ecology/project-EEB324/ABM-LU-program/AMB-LU-graphs/initial_quality_map.png"
+from __future__ import annotations
 
-seed = 67
+from dataclasses import dataclass, replace
+from pathlib import Path
 
-##### LANDSCAPE PARAMETERS #####
 
-n_rows = 20
-n_cols = 20
-n_farmers = 30
+ROOT_DIR = Path(__file__).resolve().parents[1]
+OUTPUT_DIR = ROOT_DIR / "results" / "andrew-ethan"
+RAW_OUTPUT_DIR = OUTPUT_DIR / "raw"
+TABLE_DIR = OUTPUT_DIR / "tables"
+FIGURE_DIR = OUTPUT_DIR / "figures"
 
-farm_mu = 0.0 
-farm_sigma = 1.0
 
-q_sigma = 1.0
-q_length_scale = 3.0
+@dataclass(frozen=True)
+class ModelParameters:
+    """Top-level parameter bundle for the land-use ABM."""
 
-##### SIMULATION PARAMETERS #####
-n_steps = 25 
-regime = "policy"           #choose from: "productivist", "market", "policy"
-subsidy_type = "practice"   #choose from: "practice", "conversion", "results"
+    seed: int = 67
+    n_replicates: int = 5
+    n_steps: int = 25
 
-##### PRODUCTION PARAMETERS #####
+    ##### LANDSCAPE PARAMETERS #####
+    n_rows: int = 20
+    n_cols: int = 20
+    n_farmers: int = 30
+    farm_mu: float = 0.0
+    farm_sigma: float = 1.0
+    q_sigma: float = 1.0
+    q_length_scale: float = 3.0
 
-output_price = 1.0
+    ##### INITIAL CONDITIONS #####
+    initial_land_use: str = "I"
+    initial_environmental_quality: float = 0.0
 
-alpha_I = 1.2
+    ##### PRODUCTION PARAMETERS #####
+    output_price: float = 1.0
+    alpha_I: float = 1.2
+    organic_to_intensive_yield_ratio: float = 0.75
+    gamma_I: float = 1.0
+    gamma_O: float = 1.0
+    alpha_S: float = 0.0
+    gamma_S: float = 1.0
 
-organic_to_intensive_yield_ratio = 0.75
-alpha_O = organic_to_intensive_yield_ratio * alpha_I
+    ##### PRODUCTION COST PARAMETERS #####
+    c_I: float = 0.35
+    kappa_I: float = 0.30
+    c_O: float = 0.28
+    kappa_O: float = 0.20
+    c_S: float = 0.0
+    kappa_S: float = 0.0
 
-gamma_I = 1.0
-gamma_0 = 1.0
+    ##### FARMER HETEROGENEITY #####
+    sigma_eta_I: float = 0.010
+    sigma_eta_O: float = 0.015
 
-##### PRODUCTION COST PARAMETERS #####
+    ##### ENVIRONMENTAL DYNAMICS #####
+    r_S: float = 0.06
+    r_O: float = 0.03
+    d_I: float = 0.05
+    theta: float = 0.02
+    environmental_min: float = -1.0
+    environmental_max: float = 1.0
 
-# Higher fixed-cost and higher sensitivity to land quality for intensive agriculture compared to organic
-c_I = 0.35
-kappa_I = 0.30
+    ##### PRACTICE-BASED SUBSIDY #####
+    s_O: float = 0.02
+    s_S: float = 0.06
 
-c_O = 0.28
-kappa_O = 0.20
+    ##### CONVERSION SUBSIDY #####
+    s_C: float = 0.08
+    conversion_duration: int = 3
 
-# no production cost for set-aside land
-c_S = 0.0
-kappa_S = 0.0
+    ##### RESULTS-BASED SUBSIDY #####
+    beta: float = 0.08
+    results_threshold: float = 0.20
+    results_payment_mode: str = "continuous"  # choose from: "continuous", "threshold"
 
-##### FARMER HETEROGENEITY #####
+    @property
+    def alpha_O(self) -> float:
+        return self.organic_to_intensive_yield_ratio * self.alpha_I
 
-sigma_eta_I = 0.010
-sigma_eta_O = 0.015
+    def with_overrides(self, **overrides: object) -> "ModelParameters":
+        return replace(self, **overrides)
 
-##### ENVIRONMENTAL DYNAMICS #####
 
-r_S = 0.06
-r_O = 0.03
-d_I = 0.05
-theta = 0.02
-initial_E = 0.0
+@dataclass(frozen=True)
+class ScenarioConfig:
+    """Configuration for one scenario shown in the project outputs."""
 
-##### PRACTICE-BASED SUBSIDY #####
+    name: str
+    label: str
+    regime: str
+    subsidy_type: str | None = None
+    color: str = "#4c566a"
 
-s_O = 0.10
-s_S = 0.22
 
-##### CONVERSION SUBSIDY #####
+DEFAULT_PARAMETERS = ModelParameters()
 
-s_C = 0.25
+CORE_SCENARIOS: tuple[ScenarioConfig, ...] = (
+    ScenarioConfig(
+        name="productivist",
+        label="Productivist",
+        regime="productivist",
+        subsidy_type=None,
+        color="#b54b4b",
+    ),
+    ScenarioConfig(
+        name="market",
+        label="Market",
+        regime="market",
+        subsidy_type=None,
+        color="#2a6f97",
+    ),
+    ScenarioConfig(
+        name="policy_practice",
+        label="Policy: practice subsidy",
+        regime="policy",
+        subsidy_type="practice",
+        color="#4b8f5c",
+    ),
+)
 
-##### RESULTS-BASED SUBSIDY #####
+ROBUSTNESS_SCENARIOS: tuple[ScenarioConfig, ...] = (
+    ScenarioConfig(
+        name="market",
+        label="Market",
+        regime="market",
+        subsidy_type=None,
+        color="#2a6f97",
+    ),
+    ScenarioConfig(
+        name="policy_conversion",
+        label="Policy: conversion subsidy",
+        regime="policy",
+        subsidy_type="conversion",
+        color="#c17c2f",
+    ),
+    ScenarioConfig(
+        name="policy_results",
+        label="Policy: results subsidy",
+        regime="policy",
+        subsidy_type="results",
+        color="#5b7c99",
+    ),
+)
 
-beta = 0.15
+def replicate_seeds(params: ModelParameters = DEFAULT_PARAMETERS) -> tuple[int, ...]:
+    """Use deterministic consecutive seeds for replicate runs."""
+
+    return tuple(params.seed + offset for offset in range(params.n_replicates))

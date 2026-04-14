@@ -9,3 +9,8 @@
 *.run.xml
 *.synctex.gz
 *.toc
+.venv/
+.mplconfig/
+__pycache__/
+*.pyc
+tmp-calibration/
