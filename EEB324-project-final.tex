@@ -5,8 +5,8 @@
 \usepackage{geometry}
 \geometry{margin=1in}   
 
-\usepackage{doi}
-\usepackage{natbib}
+\usepackage[style=authoryear, sorting=nyt]{biblatex}
+\addbibresource{references.bib}
 
 \title{Agent-based modeling of agricultural land-use and environmental policy}
 \author{T. Orlando Da Costa, Ethan Hsu, Nikki Lin, Andrew Yang}
@@ -16,7 +16,7 @@
 
 \maketitle
 
-\section*{Introduction}
+\section{Introduction}
 
 Land-use change is one of the main drivers of biodiversity loss, soil degradation, and changes in ecosystem functioning (\cite{yin2020soil,foley2005consequence, tilman2011nature}). Agricultural systems in particular must simultaneously provide food production, farmer income, and environmental public goods such as biodiversity, soil quality, and water regulation (\cite{power2010ecosystem}. However, these objectives are often in conflict: intensive agriculture increases short-run production but may degrade environmental quality over time (\cite{tanentzap2015conflict,tilman2002nature, foley2005consequence}). Designing policies that reconcile agricultural production and environmental sustainability is therefore a central problem in ecological economics and land system science (\cite{lambin2011global}).
 
@@ -26,18 +26,12 @@ Existing literature has approached this problem using both optimization models a
 
 Despite these advances, an important gap remains in understanding how different farmer decision rules interact with environmental subsidies to influence land-use allocation and end environmental dynamics within a heterogeneous landscape. In particular it remains unclear whether environmentally targeted subsidies can induce shifts away from intensive land use while maintaining farm-level profitability. This project addresses this gap by using an agent-based model in which heterogeneous farmers allocate land across different uses depending on land quality, production costs, and policy incentives. We compare three regimes: a productivist regime where farmers maximize output, a market regime where farmers maximize profit, and a policy regime where farmers maximize profit including environmental subsidies. By comparing these regimes, the model evaluates whether environmental subsidies can simultaneously support farm profitability and improve environmental outcomes. This approach follows the literature using agent-based land-use models to study agricultural policy and environmental outcomes (\cite{matthews2007abm, dai2020landsystem, baldi2025cap}). This project contributes to this literature by constructing a simple theoretical agent-based model to study how environmental subsidies influence land-use decisions and environmental dynamics.
 
-\section*{Methods}
+\section{Methods}
+\subsection{Modeling Framework}
+We developed a spatially explicit agent-based model (ABM) to study how heterogeneous farmers allocate land across alternative uses under different policy regimes. The model consists of a set of land plots and a population of farmers who make decentralized land-use decisions based on land-quality, production returns, and policy incentives. Land-use patterns emerge endogenously from these individual decisions. No empirical calibration data was collected; instead, parameters are set to plausible ranges consistent with agricultural economics literature, and the model is analyzed through simulation experiments that compare outcomes across decision regimes. 
 
-\paragraph{Modeling framework}
-We developed a spatially explicit agent-based model (ABM) to study how heterogeneous farmers allocate land across alternative uses under different policy regimes. The model consists of a set of land plots and a population of farmers who make decentralized land-use decisions based on land-quality, production returns, and policy incentives. Land-use patterns emerge endogenously from these individual decisions. 
-
-\paragraph{Landscape}
-
-The landscape consists of plots $k = 1, \dots, K$, each characterized by an initial land quality $q_k \in [0,1]$. Land quality is spatially auto-correlated, so that neighboring plots tend to exhibit similar levels of quality. Formally, let $q_k$ be defined on a spatial grid, and assume
-\[
-q_k = f(\varepsilon_k), \qquad \varepsilon_k \sim \mathcal{N}(0,1),
-\]
-where $f(\cdot)$ is a smoothing operator (e.g. a Gaussian kernel applied over neighboring plots), inducing correlation such that
+\subsection{Landscape}
+The landscape consists of plots $k = 1, \dots, K$, each characterized by an initial land quality $q_k \in [0,1]$. Land quality is spatially auto-correlated, so that neighboring plots tend to exhibit similar levels of quality. Formally, we draw noise $\varepsilon_k \sim \mathcal{N}(0,1)$ on a spatial grid and apply a smoothing operator  $f(\cdot)$ (a Gaussian kernel applied over neighboring plots), inducing correlation such that
 \[
 \text{Cov}(q_k, q_{k'}) = \sigma^2 \exp\left(-\frac{d(k,k')}{\ell}\right),
 \]
@@ -57,7 +51,7 @@ To allocate farmers over this heterogeneous landscape, we assign ownership of pl
 
 At each time step, farmers observe current land quality, environmental conditions, and policy incentives, and choose the land use of each plot. In the baseline model, these decisions are updated period by period; as a possible extension, adjustment costs or switching frictions may be introduced to limit unrealistic year-to-year reallocation.
 
-\paragraph{Production}
+\subsection{Production}
 Let $a_{i,k,t} \in \{I,O,S\}$ denote the land use chosen by farmer $i$ on plot $k$ at time $t$, where $I$ denotes intensive agriculture, $O$ organic agriculture, and $S$ conservation/set-aside. Output on plot $k$ at time $t$ depends on current land quality and land use:
 \[
 y(a_{i,k,t}, q_{k,t}),
@@ -72,45 +66,34 @@ y(a_{i,k,t},q_{k,t}) = \alpha_{a_{i,k,t}} q_{k,t}^{\gamma_{a_{i,k,t}}},
 \]
 Where $\alpha_{a_{i,k,t}}$ and $\gamma_{a_{i,k,t}}$ are positive parameters that determine the productivity and the responsiveness of the yields to the quality of the land. 
 
-\paragraph{Production Cost}
-Intensive agriculture relies heavily on purchase inputs such as fertilizers and pesticides, while organic production requires greater labor and management efforts. Production cost also tend to rise with the decline of land quality, as there is an increase in input requirements on degraded soils (\cite{usda2010impact, durham2021economics}). So, baseline costs are defined as:
-\[
-c(I, q_{k,t}) = c_I + \kappa_I(1-q_{k,t})
-\]
-\[
-c(O, q_{k,t}) = c_O + \kappa_O(1-q_{k,t})
-\]
-\[
-c(S, q_{k,t}) = c_S + \kappa_S(1-q_{k,t})
-\]
+\subsection{Production Cost}
+Intensive agriculture relies heavily on purchase inputs (fertilizers and pesticides), while organic production requires greater labor and management efforts. Production cost also tend to rise with the decline of land quality, as there is an increase in input requirements on degraded soils (\cite{usda2010impact, durham2021economics}). So, baseline costs are defined as:
+$$c(a, q_{k,t}) = c_a + \kappa_a (1 - q_{k,t}),$$
+where $c_a > 0$ is the fixed cost component and $\kappa_a \ge0$ governs the sensitivity of costs to land degradation. Conservation incurs the lowest direct costs: $c_i(S, q) < c_i(I, q)$ and $c_i(S, q) < c_i(O, q)$ for all farmers $i$.
 
-\paragraph{Environmental dynamics}
-Each plot has an environmental state variable $E_{k,t}$ representing soil quality / biodiversity index / ecological condition. Environmental quality evolves according to land use:
+\subsection{Environmental Dynamics}
+Each plot has an environmental state variable $E_{k,t}$ representing soil quality, biodiversity index, and ecological condition. Environmental quality evolves according to land use:
 \[
 E_{k,t+1} = E_{k,t} + r_S \mathbf{1}\{a_{i,k,t}=S\} + r_O \mathbf{1}\{a_{i,k,t}=O\} - d_I \mathbf{1}\{a_{i,k,t}=I\}.
 \]
-We assume
-\[
-d_I > r_S > r_O \geq 0,
-\]
-so that conservation generates the strongest environmental improvement, organic agriculture a smaller positive effect, and intensive agriculture degrades environmental quality. Land quality then evolves according to environmental quality:
+with $d_I > r_S > r_O \geq 0$, so that conservation generates the strongest environmental improvement, organic agriculture a smaller positive effect, and intensive agriculture degrades environmental quality. Land quality then evolves according to environmental quality:
 \[
 q_{k,t+1} = q_{k,t} + \theta E_{k,t}.
 \]
 
-$\theta > 0$ measures the sensitivity of land quality to environmental conditions and determines the speed at which ecological dynamics translate into changes in productive capacity. Since $q_{k,t} \in [0,1]$, $\theta$ is chosen sufficiently small so that updates remain bounded in this interval (after truncation if necessary), and can be interpreted as a scaling parameter linking environmental quality units to land productivity.
+where $\theta > 0$ measures the sensitivity of land quality to environmental conditions and determines the speed at which ecological dynamics translate into changes in productive capacity. Since $q_{k,t} \in [0,1]$, $\theta$ is chosen sufficiently small so that updates remain bounded in this interval (after truncation if necessary), and can be interpreted as a scaling parameter linking environmental quality units to land productivity.
 
-\paragraph{Subsidy design.}
-To study how policy design shapes land-use allocation, we consider three stylized subsidy designs: a differentiated practice-based subsidy,a conversion subsidy, and a results-based subsidy.
+\subsection{Subsidy Design}
+To study how policy design shapes land-use allocation, we consider three stylized subsidy designs: a differentiated practice-based subsidy, a conversion subsidy, and a results-based subsidy.
 
-First, we consider a \emph{practice-based subsidy} that pays different amounts depending on the practice implemented:
+\paragraph{Practice-based subsidy.} Payments depend on the practice implemented:
 \[
 Sub^{P}_{i,t} = s_O \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t}=O\} + s_S \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t}=S\},
 \]
 with $s_S > s_O > 0$ when conservation is intended to generate a larger environmental gain than organic production.
 
 
-Second, we consider a \emph{conversion-to-organic subsidy} that rewards the transition from intensive to organic agriculture. A simple specification is:
+\paragraph{Conversion-to-organic subsidy}. Rewards the transition from intensive to organic agriculture. A simple specification is:
 \[
 Sub^{C}_{i,t} = s_C \sum_{k \in K_i} \mathbf{1}\{a_{i,k,t-1}=I,\; a_{i,k,t}=O\},
 \]
@@ -120,7 +103,7 @@ Sub^{C,T}_{i,t} = s_C \sum_{k \in K_i} \mathbf{1}\{0 < t-t^{conv}_{i,k} \leq T_C
 \]
 where $t^{conv}_{i,k}$ is the period in which plot $k$ was most recently converted to organic production.
 
-Third, we consider a \emph{results-based subsidy} tied to realized ecological outcomes rather than declared practices. Let $E_{k,t}$ denote an observable ecological performance indicator on plot $k$ at time $t$. A simple specification is:
+\paragraph{Results-based subsidy.} Payments tied to realized ecological outcomes rather than declared practices. Let $E_{k,t}$ denote an observable ecological performance indicator on plot $k$ at time $t$. A simple specification is:
 \[
 Sub^{R}_{i,t} = \beta \sum_{k \in K_i} E_{k,t}, \qquad \beta > 0,
 \]
@@ -129,8 +112,8 @@ or, more conservatively,
 Sub^{R,th}_{i,t} = \beta \sum_{k \in K_i} \mathbf{1}\{E_{k,t} \geq \bar B\}.
 \]
 
-\paragraph{Farmer objectives}
-Let $p>0$ denote the output price and let $c_i(a_{i,k,t})$ denote the cost incurred by farmer $i$ from assigning land use $a_{i,k,t}$ to plot $k$ at time $t$. We consider three decision regimes:
+\subsection{Farmer Objectives}
+Let $p>0$ denote the output price and let $c_i(a_{i,k,t})$ denote the cost incurred by farmer $i$ from assigning land use $a_{i,k,t}$ to plot $k$ at time $t$. At each period, farmers maximize one of three objective functions reflecting different decision regimes:
 
 \textbf{1. Output maximization (productivist regime):}
 \[
@@ -151,7 +134,7 @@ Let $p>0$ denote the output price and let $c_i(a_{i,k,t})$ denote the cost incur
 + Sub_{i,t}.
 \]
 
-\paragraph{Farmer heterogeneity.}
+\subsection{Farmer Heterogeneity}
 To preserve the agent-based character of the model while keeping the specification parsimonious, farmers differ primarily in plot endowments, farm size, and private net costs of assigning a given land use to a plot. We therefore use a single farmer-specific cost function $c_i(a_{i,k,t},q_{k,t})$, interpreted broadly as the private net cost of assigning practice $a_{i,k,t}$ to plot $k$, including production-related costs and any private burden associated with adoption. To capture heterogeneity across farmers, we introduce technology-specific cost components $\eta_{i, I}$ and $\eta_{i,O}$ representing the differences in management ability, technology adoption, and opportunity costs under intensive and organic production. Farmer-specific costs are defined as:
 \[
 c_i(I,q_{k,t}) = c(I,q_{k,t}) + \eta_{i,I}
@@ -168,47 +151,123 @@ where
 \]
 We do not impose a fixed ranking between the costs of intensive and organic agriculture, since their relative magnitudes may vary across crops, technologies, and local conditions. We assume only that conservation/set-aside has a lower direct private cost than active production, so that:
 \[c_i(S,q_{k,t}) < c_i(I,q_{k,t}), \qquad c_i(S,q_{k,t}) < c_i(O,q_{k,t})\]
-As a possible extension, we may introduce farmer-specific responsiveness to policy incentives. Let $\rho_i \in [0,1]$ denote the probability that farmer $i$ updates land use in response to a change in relative net returns, so that lower values of $\rho_i$ capture greater behavioral stickiness. In the baseline model, however, responsiveness is not imposed directly and instead emerges from heterogeneity in costs, land quality, and farm structure.
+
+\subsection{Simulation Experiments}
+We will simulate the model for 25 periods under the three decision regimes (productivist, market, and practice-subsidy) and compare: (i) average land quality $\bar{q}_t$; (ii) average environmental quality$\bar{E}_t$ (iii) total agricultural output $Y_t$; (iv) mean pre-subsidy farmer profit; and (v) land-use shares (I, O, S). A robustness analysis then replaces the practice subsidy with the conversion and results-based subsidies, holding the market regime as the baseline comparator, to assess the sensitivity of land-use dynamics and environmental outcomes to subsidy design.
+
+\section{Results}
+\subsection{Landscape and Land-Use Allocation}
+The initial spatial configuration of the model exhibits substantial heterogeneity in both land quality and farm structure. Land quality varies smoothly across space due to the imposed spatial autocorrelation, with low-quality plots concentrated in one region of the grid and high-quality plots in another. Farm holdings are spatially contiguous and vary significantly in size, reflecting the log-normal distribution of farm sizes and the clustered allocation rule. This creates a realistic landscape in which farmers operate on locally similar land conditions (\textit{Fig 1}). 
+
+The initial land-use allocation further introduces heterogeneity across the system. While most plots are assigned to intensive production, a non-trivial share is allocated to organic and conservation uses, particularly on lower-quality plots or by farmers with lower relative costs for alternative practices. The initial variation in both land quality and farmer behavior sets up the divergent dynamics observed across regimes (\textit{Fig. 2}).
+
+\begin{figure} [hbt!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figure 1.png}
+\caption{Initial Plot Quality and Farm Boundaries. Heatmap of baseline land quality across the simulated landscape, with farm boundaries overlaid in white. Farms vary considerably in size and quality.}
+
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{figure} [hbt!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figure 2.png}
+    \caption{Initial Land-Use Allocation and Farm Boundaries. The farms have three different ways to use the land: intensive, organic, or conservation/set-aside. For small farms they are either 100\% intensive (I) or 100\% organic (O). Large farms: 100\% I or \{90\% I, 10\% S\}. Middle-sized farms: 100\% I, \{90\% I, 10\% S\} or 100\% O.
+}
+    \label{Figure 2}
+\end{figure}
+The final spatial land-use maps at period 25 make the aggregate divergence concrete (\textit{Fig. 3}). The productivist landscape is entirely intensive, a uniform red grid with no conservation or organic land anywhere. The market landscape is strikingly different with roughly half the plots are in conservation, with intensive plots (red) concentrated in spatially contiguous clusters, and organic plots (green) scattered sparsely throughout. The practice-subsidy landscape resembles the market outcome in its broad structure but shifts the balance modestly, where the intensive clusters remain prominent but conservation areas are somewhat more fragmented, and organic plots appear in slightly more dispersed locations. The key spatial regularity shared by both market and policy regimes, which is absent entirely under productivist incentives, is the emergence of mixed land use, with conservation acting as a spatial buffer distributed across the landscape.
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{final_land_use_maps.png}
+    \caption{Final Land Use: Productivist, Market, and Practice Subsidy. Spatial distribution of land use practices, productivist  (left), market (middle), and practice subsidy (right), at the end of the simulation at the 25th period.} 
+    \label{fig:placeholder}
+\end{figure}
 
 
-\paragraph{Simulation experiments.}
-We will simulate the model under the three decision regimes.
-For each scenario we will compare:
-\begin{itemize}
-    \item total agricultural output;
-    \item mean farmer profit and the share of farmers above baseline profit;
-    \item land-use shares $(I,O,S)$;
-    \item average environmental quality $\bar E_t$;
-    \item spatial clustering of intensive versus conservation land.
-\end{itemize}
+\subsection{Diverging Trajectories Across Decision Regimes}
+\paragraph{Environmental and Land Quality.} The evolution of land quality, environmental quality, total output, and farmer profits reveal strong divergence across the productivist, market, and policy regimes (\textit{Fig. 4}). Under the productivist regime, average environmental quality falls continuously from roughly zero at initialization, reaching $-1.000$ by period 25. The average land quality correspondingly collapses from $0.45$ to below $0.20$. The market regime stabilizes both environmental and land quality near their initial levels, ending at a final environmental quality of $+0.029$. The land quality under the market regime was sustained around $0.45$. The policy regime that -practice subsidy achieves a final environmental quality of $+0.124$. This is a fourfold improvement over the market baseline, where under the policy regime the land quality increased throughout the simulation from $0.45$ to about $0.50$. 
+
+\paragraph{Total Output.} The productivist regime generates the highest early output by directing all land into intensive production, but this advantage is self-undermining. As land quality degrades, productivist yields fall continuously, crossing below market-regime and policy regime outputs at around period 17 and ending the simulation well below both alternatives. Market and policy output decline modestly before stabilizing, with the policy regime generating the lowest output in early periods. This reflects the shift of land into conservation and organic uses but maintaining greater stability thereafter. After 25 periods, productivist regime ends with below $100$ output, while market regime has around $140$ output and policy regime having the highest output of approximately $165$ output. 
+
+\paragraph{Mean Farmer Profit.} Policy-regime farmers had the highest pre-subsidy profit throughout the entire simulation, from $+1.8$ at period 1 and ending around $+1.5$ at period 25. The market-regime farmers earn relatively stable profits, where it also begins near $+1.8$ at periods 1 and ending near $+1.0$. Productivist farmers begin near zero profit at period 1 and decline steadily into deeply negative territory, reaching approximately $-5.0$ by period 25. The fact that policy-regime pre-subsidy profits exceed market profits throughout indicates that the land-quality feedback channel begins operating immediately, where the shift toward less intensive use in period 1 slows degradation and preserves yield capacity, reducing input costs from the very first period. Subsidies thus improve farmer welfare not only through direct transfers but also by inducing land-use choices that are immediately more profitable in net terms due to lower degradation-linked costs.
+
+\begin{figure} [hbt!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figure 3.png}
+    \caption{Evolution of Environmental and Economic Outcomes: Productivist, Market, and Practice Subsidy. Time-series evolution of average land quality (top-left), average environmental quality (top- right), total output (bottom-left), and mean farmer profit (bottom-right) over 25 simulation periods.}
+    \label{fig:placeholder}
+\end{figure}
+\subsection{Land-Use Dynamics}
+The land-use shares changed across the regimes over the 25 periods (\textit{Fig. 5}). The productivist regime maintains a 100\% intensive share throughout all 25 periods with no land allocated to organic or conservation use at any point. 
+
+The intensive share drops sharply in the first period under both the market and practice-subsidy regimes, falling from near $1.0$ to approximately $0.50$ (market) and $0.40$ (policy) as farmers respond to profit and subsidy incentives. The policy regime maintains a modestly lower intensive share through most of the simulation, hovering near $0.40–0.45$ from periods 1 through 17, before the two regimes converge toward similar intensive shares of approximately $0.50$–$0.55$ by period 25. 
+
+The organic share remains low across all regimes throughout the simulation. The practice-subsidy regime maintains a slightly elevated organic share, rising gradually from $0$ to approximately $0.12$ by mid-simulation before declining slightly. The market regime's organic share similar trends and converges toward similar levels by period 25. This pattern confirms that organic farming is not the primary margin of adjustment under either regime.
+
+For the conservation share, both the market and practice-subsidy regimes shift approximately 45–55\% of land into set-aside by the first few periods. The policy regime peaks slightly higher (approximately $0.55$ at period 2) before declining gradually to approximately $0.35$ by period 25, while the market regime peaks near $0.45$ and stabilizes around $0.40$. 
 
 
-\paragraph{Expected contribution.}
-Our expectation is that, without policy, the model will generate over-allocation to intensive land use, especially on high-quality plots, leading to environmental decline over time. A sufficiently well-calibrated eco-subsidy should partially reverse this pattern by making conservation or lower-impact cultivation privately attractive. The main result of interest is not simply that "more subsidy improves the environment", but whether there is an intermediate region in which environmental indicators improve substantially while farm profits are maintained.
+\begin{figure} [hbt!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{figure 4.png}
+    \caption{Land Use Composition Over Time: Productivist, Market, and Practice Subsidy. Share of intensive, organic, and conservation land use across 25 time-steps for the three different regimes (Productivist, Market, and Practice Subsidy).}
+    \label{fig:placeholder}
+\end{figure}
+\subsection{Comparing Subsidy Designs}
+Having established that environmental subsidies (practice-based) outperform the market baseline, we now ask whether the form of the subsidy matters. We compare the conversion and results-based subsidy designs to the market regime as the baseline model (\textit{Figs. 6–7}).
 
-\paragraph{Possible extension.}
-If time permits, we will extend the model in two directions. First, we will introduce {social imitation}, so that farmers may probabilistically copy the land-use choices of nearby successful farmers. Let $\mathcal{N}(i)$ denote the set of farmers located within a given spatial radius of farmer $i$, and let $w_{ij}$ be proximity weights satisfying $w_{ij} \propto \exp(-d_{ij}/\lambda)$ and $\sum_{j \in \mathcal{N}(i)} w_{ij}=1$, where $d_{ij}$ is the distance between farmers $i$ and $j$ and $\lambda$ governs the spatial decay of influence. Let $\bar{\pi}_{j,t}$ denote farmer $j$'s recent average profit. Then farmer $i$ updates by imitation with probability
-\[
-P^{imit}_{i,t} = \rho_i \sum_{j \in \mathcal{N}(i)} w_{ij} \frac{\max\{\bar{\pi}_{j,t}-\bar{\pi}_{i,t},0\}}{1+\max_{\ell \in \mathcal{N}(i)} |\bar{\pi}_{\ell,t}-\bar{\pi}_{i,t}|},
-\]
-where $\rho_i \in [0,1]$ captures farmer-specific behavioral responsiveness. Conditional on imitation, farmer $i$ copies the land-use rule or plot-level allocation of a neighboring farmer $j$ drawn with probability proportional to $w_{ij}\max\{\bar{\pi}_{j,t}-\bar{\pi}_{i,t},0\}$. \\
+\paragraph{Environmental and land quality.} The three subsidy designs produce markedly different environmental trajectories. The conversion subsidy achieves by far the strongest environmental improvement with a final average environmental quality of $+0.358$, compared with $+0.124$ for the practice-based subsidy and just $+0.035$ for the results-based subsidy which barely improves on the market baseline of $+0.029$. Correspondingly, average land quality rises most steeply under the conversion subsidy, climbing from $0.45$ to approximately $0.57$ by period 25, compared with $0.50$ under the practice-based design and $0.46$ under the results-based design.
 
-Second, we will allow for {path dependence and threshold ecological dynamics}. In particular, land quality may become difficult to restore once environmental conditions fall below a critical threshold. A simple specification is
-\[
-q_{k,t+1} = q_{k,t} + \theta E_{k,t} - \delta \, \mathbf{1}\{E_{k,t}<\underline{E}\},
-\]
-where $\underline{E}$ is a degradation threshold and $\delta>0$ is an additional persistent loss in productive capacity incurred when the plot crosses that threshold. More generally, recovery may become weaker after collapse, for example:
-\[
-q_{k,t+1} = q_{k,t} + \theta_1 E_{k,t}\mathbf{1}\{E_{k,t}\geq \underline{E}\} + \theta_2 E_{k,t}\mathbf{1}\{E_{k,t}<\underline{E}\}, \qquad 0 \leq \theta_2 < \theta_1,
-\]
-so that ecological degradation generates hysteresis. These extensions would allow us to study whether temporary policy or imitation-induced shifts in behavior can prevent irreversible land degradation or, conversely, whether early intensive use can lock parts of the landscape into persistently low-quality states.
+\paragraph{Total output and farmer profit.} The conversion subsidy also generates the strongest long-run output, reaching approximately $220$ units by period 25. Mean pre-subsidy farmer profit ends at $1.619$ under the conversion design, compared with $1.179$ under the market baseline and $1.219$ under the results-based design and a mean subsidy cost of $0.476$ and $0.255$ per farmer per period respectively. 
 
-\bibliographystyle{plainnat}
-\bibliography{references}
+\begin{figure} [hbt!]
+    \centering
+    \includegraphics[width=0.25\linewidth]{figure6.png}
+    \caption{Evolution of Environmental and Economic Outcomes: Market, Conversion Subsidy, and Results Subsidy. Time-series evolution of average land quality (top-left), average environmental quality (top- right), total output (bottom-left), and mean farmer profit (bottom-right) over 25 simulation periods.}
+    \label{fig:placeholder}
+\end{figure}
 
+\paragraph{Land-use dynamics.} The subsidy designs generate qualitatively distinct land-use trajectories (\textit{Fig. 7}). The conversion subsidy produces strongly oscillatory dynamics, as payments reward transitions rather than steady-state organic practice. So, farmers repeatedly cycle land between intensive and organic use to re-qualify for payments, causing the organic share to swing between approximately $0.18$ and $0.55$ across periods while the intensive share fluctuates approximately between $0.20$ and $0.65$. By period 25, the organic share reaches $64.75\%$, while the conservation share declines to near zero. The results-based subsidy produces land-use shares nearly identical to the market baseline.
+\begin{figure} [hbt!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figure7.png}
+    \caption{Land Use Composition Over Time: Market, Conversion Subsidy, and Results Subsidy. Share of intensive, organic, and conservation land use across 25 time-steps for the three different regimes (Market, Conversion Subsidy, and Results Subsidy).}
+    \label{fig:placeholder}
+\end{figure}
+
+\paragraph{Spatial outcomes.} The final spatial maps confirm these patterns (\textit{Fig. 8}). The market map shows the familiar mixed pattern of intensive and conservation land with sparse organic plots. The conversion-subsidy landscape is visually dominated by organic production, with intensive plots interspersed in a fragmented pattern and minimum conservation. The results-based subsidy map is nearly indistinguishable from the market baseline, with a similar ratio of intensive to conservation land and an equally sparse organic presence.
+\begin{figure} [hbt!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{figure8.png}
+    \caption{Final Land Use: Market, Conversion Subsidy, and Results Subsidy. Spatial distribution of land use practices, market  (left), conversion (middle), and results-based subsidy (right), at the end of the simulation at the 25th period. }
+    \label{fig:placeholder}
+\end{figure}
+
+\section{Discussion}
+
+\subsection{Impact of Environmental Subsidies}
+The most fundamental result is that both the market and practice-subsidy regimes substantially outperform the productivist regime on every metric. Ecological collapse and severe long-run economic losses are simultaneous outcomes under productivist incentives, as farmers who maximize output without cost exposure to degradation systematically destroy the soil quality on which their own future productivity depends on (\textit{Fig. 4}). This is consistent with theoretical arguments that short-run output maximization is dynamically inconsistent in the presence of ecological feedback (\cite{foley2005consequence}). By contrast, profit exposure alone is sufficient to avert this collapse, where the market regime stabilizes environmental quality near its initial level and sustains farm profitability throughout the simulation. This reflects that cost internalization through input pricing can discipline land-use decisions even without explicit conservation policy (\cite{yang2025rice, zheng2026price}). The practice-based subsidy improves modestly on the market baseline, achieving roughly four times the market's final environmental quality and slightly higher land quality (\textit{Fig .4}), but the more striking finding is how similar the two regimes are. Despite the additional policy incentive, the final land-use allocation under the practice subsidy converges toward the market allocation by period 25 (\textit{Fig. 3}), with intensive, organic, and conservation shares all trending toward similar levels with practice-based subsidy with slightly higher organic and intensive farming. This convergence reflects the land-quality feedback channel, where as ecological conditions improve under the subsidy, the relative return to intensive farming rises, drawing land back toward the market equilibrium. The practice subsidy thus shifts the trajectory of the system without dramatically altering its long-run allocation. Importantly, pre-subsidy profits are higher under the policy regime than the market regime from period 1 onward, consistent with recent agent-based modeling work showing that agri-environmental policies can generate win-win outcomes when land-quality feedbacks are present (\cite{coronese2023agrilove, baldi2025cap, bayram2024luxembourg}), and supporting the view that well-designed subsidies need not involve a profitability trade-off (\cite{tanentzap2015conflict, power2010ecosystem}). Hence, environmental subsidies can simultaneously support farm profitability and improve environmental outcomes through land-quality feedback channel, different agricultural techniques, and subsidy design which can all greatly influence the outcomes. 
+
+
+\subsection{Does the Form of the Subsidy Matter?}
+
+If the practice-based subsidy produces only modest separation from the unsubsidized market outcome, a natural question is whether a different subsidy design could do more. The comparison across subsidy designs reveals that the design choices of the subsidy is equally as important as implementing the subsidy. This demonstrates the  findings in the agri-environmental policy literature that payment structure shapes farmer behavior in ways aggregate cost-benefit analysis may not anticipate (\cite{pannell2008public, brady2012abm}).
+
+The conversion subsidy achieves outcomes far beyond what the practice-based design or market regime produce with final environmental quality of +0.358 versus +0.029 for the market (\textit{Fig. 6}). It also had the highest long-run output and the highest pre-subsidy farmer profits. The mechanism is fundamentally different from the practice-based design, as it rewarding transitions rather than steady-state practices. So, the conversion subsidy induces farmers to cycle land between intensive and organic use, generating strongly oscillatory land-use dynamics but accumulating substantial ecological gains with each organic period (\textit{Fig. 7}). This result illustrates the insight that incentive timing can matter as much as incentive magnitude (\cite{pannell2008public}), consistent with the literature on agri-environmental scheme design showing that transition-based payments create strategic dynamics that static policy models do not anticipate (\cite{brady2012abm, baldi2025cap}). A critical caveat, however, is that real-world organic conversion involves multi-year certification periods, agronomic adjustment costs, and regulatory compliance requirements that would substantially dampen the cycling dynamics observed here (\cite{pannell2006landholders}). The conversion design's strong performance should therefore be interpreted as reflecting the power of transition incentives under idealized conditions, not as a recommendation for conversion payments without commitment requirements.
+
+The results-based subsidy, which ties payments to realized environmental quality, was consistent with  the market baseline on any metric. The final environmental quality improves by just 0.006 and the final land allocation is nearly identical to the market outcome, despite incurring a fiscal cost of 0.255 per farmer per period (\textit{Fig. 6; Fig. 8}). This connects to the growing empirical literature on results-based payments in European agri-environment schemes, which similarly finds that payment rates must exceed the opportunity cost of land-use change to induce behavioral responses (\cite{brafield2024age}), and that early-period ecological gains may be too small to generate strong incentive effects (\cite{boix2023green}). The finding that the results-based scheme costs roughly half as much per farmer as the conversion subsidy while delivering a fraction of the environmental gain further underscores the importance of evaluating subsidy designs on cost-effectiveness grounds alongside environmental impact (\textit{Fig. 6}; \cite{lambin2011global}). Overall, the subsidy comparison suggests that incentive timing and payment structure all play a role in environmental outcomes.
+
+\subsection{Limitations and Future Directions}
+
+Several important real-world factors were not explicit modeled in this project. The model does not incorporate seasonality or crop rotation. Agricultural production is inherently seasonal, with yields, costs, and environmental impacts varying across time within a year (\cite{chambers1987seasons}). This model simplifies these concepts with the assumption that these discrepancies would even out through the the time-steps. So, by modeling in discrete, identical time steps, the model focus on long-run land-use and its changes. While this simplification allows clearer interpretation of environmental feedback, it may underestimate short-term variability in both production and environmental outcomes. This leads to the second limitation, which is that this model does not include intertemporal discounting. Farmers are assumed to evaluate outcomes based on current-period returns, without explicitly discounting future profits or environmental conditions. Introducing a discount rate would allow farmers to weigh future ecological and profit gains against present returns, which would likely temper the productivist regime's most extreme outcomes. Another limitation is that there is a lack of crop choice and diversification. Farmers choose among crops with different prices, input requirements, and environmental impact, so future research can include crop-level decisions to introduce additional heterogeneity that allows for substitution between crops. Finally, the model holds the farm population fixed throughout the simulation, assuming fixed land ownership and does not allow farm entry, exit, or land markets. Allowing unprofitable farms to exit and sell their land to more profitable neighbors would introduce a selection mechanism that could partially offset ecological degradation under the productivist regime, as land would be reallocated toward farmers with lower-cost or more sustainable production technologies (\cite{shen2025alc}). Beyond these limitations, several extensions offer promising directions for future research. One particular extension is social imitation, where farmers partly copy profitable neighbors (\cite{apetrei2024social}). Exploring how economic incentives interact with social behaviour would provide a richer understanding of how agricultural systems evolve over time and the impact it has on the environment. 
+
+\newpage
+\printbibliography
 
 \section*{Appendix}
-\begin{table}
+\begin{table} [hbt!]
     \centering
 \caption{Model Variables and Parameters}
 \label{tab:placeholder}
@@ -232,12 +291,25 @@ so that ecological degradation generates hysteresis. These extensions would allo
  $I$ &Intensive agriculture\\\hline
  $O$ &Organic agriculture\\\hline
  $S$ &Conservation/set-aside\\\hline
- &\\\hline
- &\\\hline
- &\\\hline
- &\\\hline
- &\\\hline
- &\\ \hline
+ 
+$c(a, q_{k,t})$&Baseline production cost for land use a\\\hline
+ $c_i(a, q_{k,t})$&Farmer-specidic production cost\\\hline
+ $c_I, c_O, c_S$&Base costs for intensive, organic, and conservation\\\hline
+ $\kappa_a$&Sensitivity of cost to declining lanf quality\\\hline
+ $\theta$&Sensitivity of land quality to environmental conditions\\\hline
+ $d_I $&Environmental degradation rate under intensive agriculture\\ \hline
+ $r_S$&Environmental improvement rate under conservation\\\hline
+ $r_O$&Environmental improvement rate under conservation\\\hline
+ $Sub_{i,t}$&Total subsidy received by farmer $i$\\\hline
+ $s_O, s_S$&Subsidy rates for organic and conservation practices\\\hline
+ $s_C$&Conversion subsidy (from intensive to organic)\\\hline
+ $\beta$&Payment rate for results-based subsidy\\\hline
+ $\bar B$&Threshold for environmental performance (results-based subsidy)\\\hline
+ $p$&Output price\\\hline
+ $Y_{i,t}$&Total output of farmer $i$\\\hline
+ $\pi_{i,t}$&Profit of farmer $i$ at time $t$\\\hline
+ $\eta_{i, a}$&Farmer-specific cost shock for land use $a$\\\hline
+ $\sigma_\eta^2$&Variance of cost heterogeneity\\\hline
     \end{tabular}
 
 
